@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="stylesheet" href="app.css" />
+	<title>Roblox Asset Downloader</title>
+</head>
+<body>
+		<!-- ═══ Tab Bar ═══ -->
+		<div class="tabbar">
+			<button class="tab active" data-page="download">Download</button>
+			<button class="tab" data-page="explorer" id="tabExplorer" style="display:none">Explorer</button>
+			<button class="tab" data-page="history">History</button>
+			<button class="tab" data-page="settings">Settings</button>
+		</div>
+
+	<!-- ═══ Content ═══ -->
+	<main class="content">
+		<!-- ─── Download Page ─── -->
+		<section class="page active" id="page-download">
+			<div class="form">
+					<div class="form-group">
+						<label>Roblox Cookie</label>
+						<input type="password" id="cookie" placeholder=".ROBLOSECURITY cookie value" class="input" />
+						<label class="remember-line">
+							<input type="checkbox" id="rememberCookie" />
+							<span>Remember</span>
+						</label>
+					</div>
+
+				<div class="form-group">
+					<label>Place ID <span class="label-optional">(optional)</span></label>
+					<input type="text" id="placeId" placeholder="Needed for private audio" class="input" />
+				</div>
+
+				<div class="form-group">
+					<label>Asset IDs</label>
+					<textarea id="assetIds" placeholder="One per line, or comma / space separated&#10;123456789&#10;987654321&#10;111222333" class="input textarea" rows="6"></textarea>
+					<div class="form-hint">Supports multiple IDs, Roblox URLs — Ctrl+Enter to download</div>
+				</div>
+
+				<button class="btn btn-primary" id="downloadBtn">
+					<span id="downloadBtnText">Download</span>
+				</button>
+			</div>
+
+			<!-- Active Downloads -->
+			<div class="download-section" id="downloadSection" style="display:none;">
+				<div class="download-summary">
+					<span class="download-summary-text" id="downloadSummaryText">Preparing...</span>
+					<div class="progress-bar progress-bar-overall">
+						<div class="progress-fill" id="overallProgress" style="width:0%"></div>
+					</div>
+				</div>
+				<div class="download-list" id="downloadList"></div>
+			</div>
+		</section>
+
+			<!-- ─── Explorer Page ─── -->
+			<section class="page" id="page-explorer">
+				<div class="explorer-toolbar">
+					<div class="explorer-filter-row">
+						<input type="text" id="explorerSearch" placeholder="Search instances or asset IDs..." class="input explorer-search" />
+						<div class="filter-btns">
+							<button class="filter-btn" data-filter="sound">🔊 Sound</button>
+							<button class="filter-btn" data-filter="image">🖼 Image</button>
+							<button class="filter-btn" data-filter="animation">🎬 Animation</button>
+						</div>
+						<div class="duration-filter" id="durationFilter">
+							<span class="duration-label" title="Duration filter (seconds)">⏱</span>
+							<input type="number" id="durationMin" placeholder="Min" class="input input-duration" min="0" step="0.1" title="Minimum duration in seconds" />
+							<span class="duration-sep">–</span>
+							<input type="number" id="durationMax" placeholder="Max" class="input input-duration" min="0" step="0.1" title="Maximum duration in seconds" />
+						</div>
+					</div>
+				</div>
+					<div class="explorer-stats" id="explorerStats">No data — run the executor script to scan</div>
+				<div class="explorer-body">
+					<div class="explorer-tree" id="explorerTree">
+						<div class="empty-state">No instance data yet. Execute the Lua script in your executor to scan the game.</div>
+					</div>
+					<div class="explorer-props" id="explorerProps">
+						<div class="empty-state">Select an instance to view properties</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- ─── History Page ─── -->
+		<section class="page" id="page-history">
+			<div class="page-header">
+				<span class="page-title">Download History</span>
+				<button class="btn btn-secondary btn-sm" id="clearHistoryBtn">Clear All</button>
+			</div>
+			<div class="history-list" id="historyList">
+				<div class="empty-state">No downloads yet</div>
+			</div>
+		</section>
+
+		<!-- ─── Settings Page ─── -->
+		<section class="page" id="page-settings">
+			<div class="form">
+				<div class="form-group">
+					<label>Download Folder</label>
+					<div class="input-row">
+						<input type="text" id="downloadPath" readonly class="input" />
+						<button class="btn btn-secondary btn-sm" id="browseBtn">Browse</button>
+					</div>
+				</div>
+
+				<div class="form-group">
+						<label>Concurrent Downloads</label>
+						<input type="number" id="concurrency" min="1" max="10" value="3" class="input input-narrow" />
+						<div class="form-hint">Number of simultaneous downloads (1–10)</div>
+					</div>
+
+						<div class="form-group">
+							<label>Executor Bridge</label>
+							<label class="remember-line" style="margin-top:0;">
+								<input type="checkbox" id="bridgeToggle" checked />
+								<span>Enable executor bridge</span>
+							</label>
+							<div class="bridge-info" id="bridgeInfo">
+								<span class="bridge-dot" id="bridgeDot"></span>
+								<span id="bridgeStatus">Starting...</span>
+							</div>
+							<div class="form-hint" id="bridgeHint">Run this script in your executor to scan game instances and auto-fill asset IDs</div>
+							<div class="code-block-wrapper" id="bridgeCodeWrapper">
+								<pre class="code-block" id="luaScript"></pre>
+								<button class="btn btn-secondary btn-sm copy-btn" id="copyLuaBtn">Copy</button>
+							</div>
+						</div>
+				</div>
+		</section>
+	</main>
+
+	<!-- ═══ Status Bar ═══ -->
+	<footer class="statusbar">
+		<span class="statusbar-left" id="statusText">Ready</span>
+	</footer>
+
+		<!-- Toast Container -->
+		<div class="toast-container" id="toastContainer"></div>
+
+		<!-- Hidden audio element for Sound preview -->
+		<audio id="audioPreview" preload="none" style="display:none;"></audio>
+
+		<script src="script.js"></script>
+</body>
+</html>
